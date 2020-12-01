@@ -492,6 +492,7 @@ class Workflow:
         printshellcmds=False,
         printreason=False,
         printdag=False,
+            printjsondag=False,
         cluster=None,
         cluster_sync=None,
         jobname=None,
@@ -650,7 +651,8 @@ class Workflow:
             ignore_incomplete=ignore_incomplete
             or printdag
             or printrulegraph
-            or printfilegraph,
+            or printfilegraph
+            or printjsondag,
             notemp=notemp,
             keep_remote_local=keep_remote_local,
             batch=batch,
@@ -666,6 +668,7 @@ class Workflow:
             or printrulegraph
             or printfilegraph
             or printdag
+            or printjsondag
             or summary
             or archive
             or list_version_changes
@@ -726,6 +729,7 @@ class Workflow:
             and not printdag
             and not printrulegraph
             and not printfilegraph
+            and not printjsondag
         ):
             # backup globals
             globals_backup = dict(self.globals)
@@ -824,6 +828,10 @@ class Workflow:
             return True
         elif printdag:
             print(dag)
+            return True
+        elif printjsondag:
+            print("print json dag")
+            print(dag.jsondag())
             return True
         elif printrulegraph:
             print(dag.rule_dot())

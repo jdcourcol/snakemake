@@ -199,6 +199,56 @@ class DAG:
         for i, job in enumerate(self.jobs):
             job.is_valid()
 
+    def jsondag(self):
+        nodes_ = {}
+        links = []
+        for rule in self.rules:
+            label = ""
+            if rule.shellcmd:
+                label = rule.shellcmd[:20]
+            else:
+                continue
+            node = { 'id': rule.name,
+                     'value': {'label': label, 'type': 'process'}}
+            nodes_[rule.name] = node
+            for raw_input_ in rule.input:
+                if "DONE" in raw_input_:
+                    continue
+                if "SUCCESS" in raw_input_:
+                    continue
+                input_ = raw_input_.split('/')[-1]
+                node_input = nodes_.get(input_, None)
+                if not node_input:
+                    nodes_[input_] = { 'id': input_,
+                                      'value': {'label': input_ , 'type': 'data'}}
+                links.append({'u': input_, 'v': rule.name})
+            for raw_output_ in rule.output:
+                if "DONE" in raw_output_:
+                    continue
+                if "SUCCESS" in raw_output_:
+                    continue
+                output_ = raw_output_.split('/')[-1]
+                node_output = nodes_.get(output_, None)
+                if not node_output:
+                    nodes_[output_] = { 'id': output_,
+                                       'value': {'label': output_, 'type': 'data'}}
+                links.append({'u': rule.name, 'v': output_})
+        data = {
+            'nodes': [node for _, node in nodes_.items()],
+            'links': links,
+        }
+        import json
+        s = "loadData(\n"
+        s += json.dumps(data)
+        s+= "\n);\n"
+
+        with open('/Users/courcol/DEV/NGV/ArchNGV/snakemake/d3-dag-visualization/app/dag.js', 'w') as f:
+           f.write(s) 
+        return data 
+
+           
+        pass
+
     def check_directory_outputs(self):
         """Check that no output file is contained in a directory output of the same or another rule."""
         outputs = sorted(

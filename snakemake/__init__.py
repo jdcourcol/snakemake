@@ -72,6 +72,7 @@ def snakemake(
     printshellcmds=False,
     debug_dag=False,
     printdag=False,
+        printjsondag=False,
     printrulegraph=False,
     printfilegraph=False,
     printd3dag=False,
@@ -448,7 +449,7 @@ def snakemake(
         stdout = (
             (
                 dryrun
-                and not (printdag or printd3dag or printrulegraph or printfilegraph)
+                and not (printdag or printd3dag or printrulegraph or printfilegraph or printjsondag)
             )
             or listrules
             or list_target_rules
@@ -705,6 +706,7 @@ def snakemake(
                     printrulegraph=printrulegraph,
                     printfilegraph=printfilegraph,
                     printdag=printdag,
+                    printjsondag=printjsondag,
                     cluster=cluster,
                     cluster_sync=cluster_sync,
                     jobname=jobname,
@@ -1465,6 +1467,11 @@ def get_argument_parser(profile=None):
         "Note print statements in your Snakefile may interfere "
         "with visualization.",
     )
+    group_utils.add_argument(
+        "--jsondag",
+        action="store_true",
+        help="Print a json version of the dag",
+        )
     group_utils.add_argument(
         "--rulegraph",
         action="store_true",
@@ -2575,6 +2582,7 @@ def main(argv=None):
             printreason=args.reason,
             debug_dag=args.debug_dag,
             printdag=args.dag,
+            printjsondag=args.jsondag,
             printrulegraph=args.rulegraph,
             printfilegraph=args.filegraph,
             printd3dag=args.d3dag,
